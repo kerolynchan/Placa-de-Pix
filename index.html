@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Crie sua Plaquinha PIX</title>
+  <style>
+    :root{--p:#ff7ab6;--s:#6b3bd6;--card:rgba(255,255,255,0.97)}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{background:linear-gradient(135deg,var(--p),var(--s));padding:20px}
+    .container{max-width:960px;margin:0 auto;background:var(--card);border-radius:14px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,0.12)}
+    h1{text-align:center;margin-top:0;font-size:28px;color:#2b0340}
+    p.lead{text-align:center;color:#4b2f6d;margin-bottom:20px}
+    form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .full{grid-column:1/-1}
+    label{display:block;font-size:13px;color:#4b2f6d;margin-bottom:6px}
+    input[type=text],input[type=tel],input[type=email],select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e9d9f8;background:transparent}
+    textarea{min-height:80px;resize:vertical}
+    .group{background:#fff;padding:10px;border-radius:10px;border:1px solid rgba(107,59,214,0.06)}
+    .buttons{grid-column:1/-1;text-align:right;margin-top:12px}
+    button{padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+    .btn-primary{background:linear-gradient(90deg,#ff5aa8,#8b61ff);color:white}
+    .note{font-size:12px;color:#6b4b84;margin-top:4px}
+    .hidden{display:none}
+    footer{text-align:center;font-size:12px;color:#6b4b84;margin-top:20px}
+    @media (max-width:700px){form{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Crie sua Plaquinha PIX</h1>
+    <p class="lead">Preencha com suas preferências e envie direto no WhatsApp para fazer seu pedido</p>
+
+    <form id="orderForm">
+      <div class="group full">
+        <label>Seu nome completo</label>
+        <input type="text" id="clienteNome" placeholder="Ex: Maria Silva" required>
+      </div>
+
+      <div class="group">
+        <label>WhatsApp (de contato)</label>
+        <input type="tel" id="clienteWhats" placeholder="Ex: +55 11 9xxxx-xxxx" required>
+      </div>
+
+      <div class="group">
+        <label>E-mail (opcional)</label>
+        <input type="email" id="clienteEmail" placeholder="Ex: contato@email.com">
+      </div>
+
+      <div class="group full">
+        <label>Chave PIX que deve aparecer</label>
+        <input type="text" id="pixKey" placeholder="Ex: (11) 99999-9999 ou cpf@pix" required>
+      </div>
+
+      <div class="group">
+        <label>Nome a mostrar junto ao PIX</label>
+        <input type="text" id="pixNome" placeholder="Ex: Bolo da Ana">
+      </div>
+
+      <div class="group">
+        <label>Tamanho / Formato</label>
+        <select id="tamanho">
+          <option>10x15 cm (padrão A6)</option>
+          <option>15x20 cm (médio)</option>
+          <option>20x30 cm (grande A4)</option>
+          <option>8x29 cm (faixa longa)</option>
+          <option>20x10 cm (retangular fino)</option>
+          <option>Redondo 15 cm</option>
+          <option>Outro</option>
+        </select>
+      </div>
+
+      <!-- Tipo de fundo -->
+      <div class="group full">
+        <label>Paleta de cores / estilo desejado</label>
+        <select id="tipoFundo" required>
+          <option value="solido">Cor sólida (sem custo extra)</option>
+          <option value="degrade">Degradê de cores (+R$3)</option>
+          <option value="imagemTransp">Imagem de fundo transparente (+R$5)</option>
+          <option value="imagemSolida">Imagem sólida no fundo (+R$5)</option>
+        </select>
+
+        <textarea id="detalheFundo" placeholder="Descreva ou cole aqui os códigos de cor..."></textarea>
+
+        <!-- mensagem que aparece para imagem de fundo -->
+        <div class="note hidden" id="msgFundo">
+          A imagem deve ser fornecida no WhatsApp após finalizar o pedido.
+        </div>
+
+        <!-- Único seletor de cor -->
+        <div style="margin-top:6px">
+          <label>Escolha uma cor:</label><br>
+          <input type="color" id="colorPicker" value="#ff7ab6" style="width:80px;height:50px;border:none;cursor:pointer">
+          <button type="button" onclick="copiarCor()" style="padding:6px 10px;margin-left:8px;border-radius:6px;background:#6b3bd6;color:#fff;border:none;cursor:pointer">Copiar cor</button>
+        </div>
+      </div>
+
+      <!-- Imagens extras -->
+      <div class="group full">
+        <label>Deseja incluir imagens extras para decorar?</label>
+        <select id="imagensExtras">
+          <option value="nenhum">Não quero imagens extras</option>
+          <option value="enviar">Sim, vou enviar imagens (+R$10)</option>
+          <option value="liberdade">Liberdade criativa da desenhista (+R$5)</option>
+        </select>
+        <div class="note hidden" id="msgImagens">Após finalizar o pedido, envie as imagens desejadas no WhatsApp.</div>
+      </div>
+
+      <!-- Personagem próprio -->
+      <div class="group full">
+        <label><input type="checkbox" id="personagem"> Deseja criar seu personagem próprio?</label>
+        <div class="note hidden" id="msgPersonagem">Crie seu personagem aqui: <a href="https://kerolynchan.github.io/Personagem/" target="_blank">https://kerolynchan.github.io/Personagem/</a></div>
+      </div>
+
+      <!-- Logotipo -->
+      <div class="group full">
+        <label>Você tem logotipo?</label>
+        <select id="logotipo">
+          <option value="nao">Não tenho e não quero</option>
+          <option value="comprar">Não tenho, desejo comprar (+R$15)</option>
+          <option value="tenho">Já tenho</option>
+        </select>
+        <div class="note hidden" id="msgLogo">Após finalizar o pedido, envie sua imagem de logotipo no WhatsApp.</div>
+      </div>
+
+      <!-- QR Code -->
+      <div class="group full">
+        <label>Deseja fornecer código QR na plaquinha?</label>
+        <select id="qrCode">
+          <option value="nao">Não</option>
+          <option value="sim">Sim</option>
+        </select>
+        <div class="note hidden" id="msgQr">Após finalizar o pedido, envie seu código QR no WhatsApp.</div>
+      </div>
+
+      <!-- Total -->
+      <div class="group full">
+        <label>Total estimado:</label>
+        <strong id="total">R$ 20,00</strong>
+      </div>
+
+      <div class="buttons">
+        <button type="button" class="btn-primary" onclick="enviarWhatsApp()">Enviar pedido pelo WhatsApp</button>
+      </div>
+    </form>
+
+    <footer>Ao clicar em enviar, seu pedido será montado para WhatsApp.</footer>
+  </div>
+
+<script>
+  const totalEl=document.getElementById('total');
+  const imgs=document.getElementById('imagensExtras');
+  const msgImgs=document.getElementById('msgImagens');
+  const personagem=document.getElementById('personagem');
+  const msgPersonagem=document.getElementById('msgPersonagem');
+  const logotipo=document.getElementById('logotipo');
+  const msgLogo=document.getElementById('msgLogo');
+  const qrCode=document.getElementById('qrCode');
+  const msgQr=document.getElementById('msgQr');
+  const tipoFundo=document.getElementById('tipoFundo');
+  const msgFundo=document.getElementById('msgFundo');
+
+  function calcularTotal(){
+    let total=20; // base
+    if(tipoFundo.value==='degrade') total+=3;
+    if(tipoFundo.value==='imagemTransp') total+=5;
+    if(tipoFundo.value==='imagemSolida') total+=5;
+    if(imgs.value==='enviar') total+=10;
+    if(imgs.value==='liberdade') total+=5;
+    if(logotipo.value==='comprar') total+=15;
+    totalEl.textContent='R$ '+total.toFixed(2).replace('.',',');
+  }
+
+  imgs.addEventListener('change',()=>{
+    msgImgs.classList.toggle('hidden',imgs.value!=='enviar'&&imgs.value!=='liberdade');
+    calcularTotal();
+  });
+  logotipo.addEventListener('change',()=>{
+    msgLogo.classList.toggle('hidden',logotipo.value!=='tenho');
+    calcularTotal();
+  });
+  qrCode.addEventListener('change',()=>{
+    msgQr.classList.toggle('hidden',qrCode.value!=='sim');
+  });
+  tipoFundo.addEventListener('change',()=>{
+    calcularTotal();
+    // mostra mensagem só para imagem transparente e imagem sólida
+    msgFundo.classList.toggle('hidden',!(tipoFundo.value==='imagemTransp'||tipoFundo.value==='imagemSolida'));
+  });
+  personagem.addEventListener('change',()=>{
+    msgPersonagem.classList.toggle('hidden',!personagem.checked);
+  });
+
+  function enviarWhatsApp(){
+    calcularTotal();
+    const nome=document.getElementById('clienteNome').value;
+    const whats=document.getElementById('clienteWhats').value;
+    const email=document.getElementById('clienteEmail').value;
+    const pixKey=document.getElementById('pixKey').value;
+    const pixNome=document.getElementById('pixNome').value;
+    const tamanho=document.getElementById('tamanho').value;
+    const fundo=tipoFundo.options[tipoFundo.selectedIndex].text;
+    const detalhe=document.getElementById('detalheFundo').value;
+    let texto=`*Pedido Plaquinha PIX*%0A
+Nome: ${nome}%0AWhatsApp: ${whats}%0AEmail: ${email}%0AChave PIX: ${pixKey}%0ANome PIX: ${pixNome}%0A
+Tamanho/Formato: ${tamanho}%0ATipo de Fundo: ${fundo}%0ADetalhes: ${detalhe}%0A
+Imagens extras: ${imgs.options[imgs.selectedIndex].text}%0APersonagem próprio: ${personagem.checked?'Sim':'Não'}%0ALogotipo: ${logotipo.options[logotipo.selectedIndex].text}%0A
+QR Code: ${qrCode.options[qrCode.selectedIndex].text}%0ATotal: ${totalEl.textContent}`;
+    window.open(`https://wa.me/?text=${texto}`,'_blank');
+  }
+
+  // copiar cor
+  const colorPicker = document.getElementById('colorPicker');
+  function copiarCor() {
+    const cor = colorPicker.value;
+    navigator.clipboard.writeText(cor).then(() => {
+      alert('Código de cor ' + cor + ' copiado!');
+    });
+  }
+
+  calcularTotal();
+</script>
+</body>
+</html>
